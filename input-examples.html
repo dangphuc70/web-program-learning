@@ -16,12 +16,27 @@
     <canvas width="400" height="300" id="plot"></canvas>
     <input type="text" id="function-input">
     <script>
-        document.getElementById('function-input').addEventListener('keydown', logOnEnterKey);
-        function logOnEnterKey(e) {
-            if (e.key == 'Enter') {
-                console.log(document.getElementById('function-input').value);
+        class PlotFunctionUseCase {
+            plotCanvas;
+            functionInputField;
+
+            constructor(functionInputFieldId, plotCanvasId) {
+                this.plotCanvas = document.getElementById(plotCanvasId);
+                this.functionInputField = document.getElementById(functionInputFieldId);
+
+                this.functionInputField.addEventListener('keydown', this.processInputFunction);
+
+            }
+
+            processInputFunction = e => {
+                if (e.key == 'Enter') {
+                    console.log(this.functionInputField.value);
+                }
             }
         }
+
+        let plotFunctionUseCase = new PlotFunctionUseCase('function-input', 'plot');
+
     </script>
 
 </body>
