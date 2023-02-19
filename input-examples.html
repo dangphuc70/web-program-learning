@@ -34,6 +34,18 @@
 
             enterPressedInFunctionInputField = () => {
                 console.log(this.functionInputField.value);
+                this.clearPlotCanvas();
+                this.displayTextInCenterPlotCanvas(this.functionInputField.value);
+            }
+
+            clearPlotCanvas = () => {
+                let canvas = this.plotCanvas;
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            displayTextInCenterPlotCanvas = str => {
+                let canvas = this.plotCanvas;
+                canvas.getContext('2d').strokeText(str, canvas.width / 2, canvas.height / 2);
             }
         }
 
