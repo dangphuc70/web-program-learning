@@ -7,46 +7,10 @@
 
 <body>
 
-    <div class="">
+    <div>
         <h1>This is a Heading</h1>
         <p>This is a paragraph.</p>
         <p>This is another paragraph.</p>
-    </div>
-
-    <div>
-        <label for="textfield">Text Field:</label>
-        <!-- Example of input element and script interaction.
-
-            Open this page in browser
-            Bring up console to watch for output later
-            Type into this textfield and watch for outputs in the console
-         -->
-        <script>
-            function printTextFieldContent() {
-                let textfield = document.getElementById("textfield");
-                console.log(textfield.value);
-            }
-        </script>
-        <input type="text" id="textfield" oninput="printTextFieldContent()">
-
-        <br><br>
-
-        <label for="textfieldWithInlinedEventHandler">Another Text Field:</label>
-        <input type="text" id="textfieldWithInlinedEventHandler" oninput="console.log(this.value)">
-
-        <br><br>
-
-        <label for="fname">First name:</label>
-        <input type="text" id="fname" name="fname">
-
-        <br><br>
-
-        <label for="lname">Last name:</label>
-        <input type="text" id="lname" name="lname">
-
-        <br><br>
-
-        <input type="submit" value="Press to submit">
     </div>
 
 </body>
