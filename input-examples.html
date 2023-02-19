@@ -24,14 +24,16 @@
                 this.plotCanvas = document.getElementById(plotCanvasId);
                 this.functionInputField = document.getElementById(functionInputFieldId);
 
-                this.functionInputField.addEventListener('keydown', this.processInputFunction);
+                this.functionInputField.addEventListener('keydown', e => {
+                    if (e.key == 'Enter') {
+                        this.enterPressedInFunctionInputField();
+                    }
+                });
 
             }
 
-            processInputFunction = e => {
-                if (e.key == 'Enter') {
-                    console.log(this.functionInputField.value);
-                }
+            enterPressedInFunctionInputField = () => {
+                console.log(this.functionInputField.value);
             }
         }
 
