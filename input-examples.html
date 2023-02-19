@@ -13,6 +13,17 @@
         <p>This is another paragraph.</p>
     </div>
 
+    <canvas width="400" height="300" id="plot"></canvas>
+    <input type="text" id="function-input">
+    <script>
+        document.getElementById('function-input').addEventListener('keydown', logOnEnterKey);
+        function logOnEnterKey(e) {
+            if (e.key == 'Enter') {
+                console.log(document.getElementById('function-input').value);
+            }
+        }
+    </script>
+
 </body>
 
 </html>
