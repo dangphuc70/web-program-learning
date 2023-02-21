@@ -13,12 +13,13 @@
         <p>This is another paragraph.</p>
     </div>
 
-    <canvas width="400" height="300" id="plot"></canvas>
+    <canvas id="plot"></canvas>
     <input type="text" id="function-input">
     <script>
         class PlotFunctionUseCase {
             plotCanvas;
             functionInputField;
+            functionInterpreter = new MyInterpreter();
 
             constructor(functionInputFieldId, plotCanvasId) {
                 this.plotCanvas = document.getElementById(plotCanvasId);
@@ -33,9 +34,12 @@
             }
 
             enterPressedInFunctionInputField = () => {
-                console.log(this.functionInputField.value);
+                let textInputted = this.functionInputField.value;
                 this.clearPlotCanvas();
-                this.displayTextInCenterPlotCanvas(this.functionInputField.value);
+
+                let interpretedFunction = this.functionInterpreter.parse(textInputted)
+                this.displayTextInCenterPlotCanvas(interpretedFunction);
+                console.log(textInputted, ' => ', interpretedFunction);
             }
 
             clearPlotCanvas = () => {
@@ -50,6 +54,166 @@
         }
     </script>
 
+    <!-- Programming for the language of input the function input field works with.
+
+        Everything here is specific to the language of the function input field.
+      -->
+    <script>
+        class MyInterpreter {
+            parse = s => {
+                console.debug(breakIntoListBorderPairs(s));
+                return breakIntoList(s).map(this.trimWhitespaceAndParens);
+            };
+
+            /**
+             * Example: "  (((   efeoigjeoi(efe)())  ))" ->  "efeoigjeoi(efe)()"
+             */
+            trimWhitespaceAndParens = s => {
+                let trimmedWs = s.trim();
+                if (trimmedWs.charAt(0) !== '(') {
+                    return trimmedWs;
+                }
+
+                let end = trimmedWs.length;
+                if (trimmedWs.charAt(trimmedWs.length - 1) === ')') {
+                    end = trimmedWs.length - 1;
+                }
+
+                return this.trimWhitespaceAndParens(s.substring(1, end));
+
+            }
+        }
+
+        function isWhitespace(c /* string of size 1, representing one character */) {
+            return c.search(/\s/) !== -1;
+        }
+
+        function breakIntoList(str) {
+            return substrings(str, breakIntoListBorderPairs(str));
+        }
+
+        function substrings(str, borders) {
+            let result = [];
+            borders.forEach(({ begin, end }) => {
+                result.push(str.substring(begin, end));
+            });
+            return result;
+        }
+
+        /**
+         * Examples:
+         * "awg" -> [{begin: 0, end: 3}] = ["awg"]
+         *
+         * "awg bij (wfwg ()ww)egoj egeg(egeve)"
+         *   -> [{begin: 0, end: 3}, {begin: 4, end: 7}, {begin: 8, end: 19}, {begin: 19, end: 23}, {begin: 24, end: 28},
+         *       {begin: 28, end: 35}]
+         *      = ["awg", "bij", "(wfwg ()ww)", "egoj", "egeg", "(egeve)"]
+         *
+         * This function returns the list of bounds only; it does not return the list of substrings.
+         */
+        function breakIntoListBorderPairs(str) {
+            return new BreakIntoListBorderPairs().breakIntoListBorderPairs(str);
+        }
+
+        class BreakIntoListBorderPairs {
+            result = [];
+            howToReceiveNextChar;
+            nOpenParenEntered = 0;
+
+            startBlockAt = i => {
+                this.currentBlock.startAt(i);
+            }
+
+            finishBlockAt = i => {
+                this.currentBlock.endAt(i);
+                this.result.push(this.currentBlock.copy());
+                this.currentBlock.clear();
+            }
+
+            currentBlock = {
+                begin: undefined,
+                end: undefined,
+
+                startAt: i => { this.begin = i; },
+                endAt /* exclusive end */: i => { this.end = i; },
+
+                isUnclosed: () => this.begin !== undefined && this.end === undefined,
+
+                copy: () => {
+                    return {
+                        begin: this.begin,
+                        end: this.end
+                    }
+                },
+
+                clear: () => {
+                    this.begin = undefined;
+                    this.end = undefined;
+                },
+            };
+
+            constructor() {
+                this.howToReceiveNextChar = this.preBlockState;
+            }
+
+            breakIntoListBorderPairs = (str /* no leading whitespace */) => {
+                for (let i = 0; i < str.length; i += 1) {
+                    this.howToReceiveNextChar(str.charAt(i), i);
+                }
+                this.endString(str.length);
+                return this.result;
+            }
+
+            preBlockState = (c, i /* expect 0 */) => {
+                if (c == '(') {
+                    this.openParenAt(i);
+                } else if (!isWhitespace(c)) {
+                    this.startIdentifierAt(i);
+                }
+            }
+
+            parenOpenedState = (c, i) => {
+                if (c === ')') {
+                    this.nOpenParenEntered -= 1;
+                    if (this.nOpenParenEntered === 0) {
+                        this.finishBlockAt(i + 1);
+                        this.howToReceiveNextChar = this.preBlockState;
+                    }
+                } else if (c === '(') {
+                    this.openParenAt(i);
+                }
+            }
+
+            midIdentifierState = (c, i) => {
+                if (c === '(') {
+                    this.finishBlockAt(i);
+                    this.openParenAt(i);
+                } else if (isWhitespace(c)) {
+                    this.finishBlockAt(i);
+                    this.howToReceiveNextChar = this.preBlockState;
+                }
+            }
+
+            openParenAt = i => {
+                this.nOpenParenEntered += 1;
+                if (this.nOpenParenEntered === 1) {
+                    this.startBlockAt(i);
+                    this.howToReceiveNextChar = this.parenOpenedState;
+                }
+            }
+
+            startIdentifierAt = i => {
+                this.startBlockAt(i);
+                this.howToReceiveNextChar = this.midIdentifierState;
+            }
+
+            endString = strLength => {
+                if (this.currentBlock.isUnclosed()) {
+                    this.finishBlockAt(strLength);
+                }
+            }
+        }
+    </script>
 
     <script>
         let plotFunctionUseCase = new PlotFunctionUseCase('function-input', 'plot');
