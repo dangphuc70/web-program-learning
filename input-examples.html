@@ -219,6 +219,35 @@
         let plotFunctionUseCase = new PlotFunctionUseCase('function-input', 'plot');
     </script>
 
+
+    <!-- Ready-made library for chart, plot drawing -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Testing example of chart.js library -->
+    <canvas id="my-chart"></canvas>
+    <script>
+        const ctx = document.getElementById('my-chart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
 </body>
 
 </html>
